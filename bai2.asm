@@ -1,70 +1,60 @@
 .data
-	iArray: .word 2, 4, 7, 1, 5, 67, 3, 21, 9, 10
-	iArray_size: .word 10
-	wrange: .asciiz"range: "
+	str:		.asciiz "Nhap ban kinh duong tron: "
+	PI:		.float 3.1415
+	str1: 		.asciiz "Dien tich = "
+	str2: 		.asciiz "Chu vi = "
+	fail:		.asciiz "Phai nhap R >= 0"
 .text
-	la $a0, wrange
-	li $v0, 4
-	syscall
-	
-	la $a0, iArray
-	lw $a1, iArray_size
-	jal range
-	
-	move $a0, $v0
-	li $v0, 1
-	syscall
-	
-	li $v0, 10
-	syscall
-##########################################	
-range:
-	addi $sp, $sp, -12
-	sw $ra, 0($sp)
-	sw $a0, 4($sp)
-	sw $a1, 8($sp)
-	jal max
-	addu $t4, $0, $v0
-	jal min
-	addu $t5, $s0, $v0
-	subu $v0, $t4, $t5
-	
-	lw $ra, 0($sp)
-	addi $sp, $sp, 12
-	addi $sp, $sp, 4  
-	jr $ra
+		la,$a0,str
+		li,$v0,4
+		syscall
+		
+		l.s $f1,PI ##  $f1 = PI = 3.1415
+		mfc1 $zero,$f5 ## $f5 = 0
+				
+		la,$v0,6 ## $f0 -> R
+		syscall
 
-##########################################	
-max:
-	addi $t0, $0, 0
-	lw $t1, ($a0)
-condmax:	
-	addi $t0, $t0, 1
-	bne $t0, $a1, loopmax
-	move $v0, $t1
-	jr $ra
-loopmax: 
-	add $a0, $a0, 4
-	lw $t2, ($a0)
-	sub $t3, $t2, $t1
-	bltz $t3, condmax
-	addu $t1, $0, $t2
-	j condmax
-###########################################
-min:
-	lw $a0, 4($sp)
-	addi $t0, $0, 0
-	lw $t1, ($a0)
-condmin:	
-	addi $t0, $t0, 1
-	bne $t0, $a1, loopmin
-	move $v0, $t1
-	jr $ra
-loopmin: 
-	add $a0, $a0, 4
-	lw $t2, ($a0)
-	sub $t3, $t2, $t1
-	bgtz $t3, condmin
-	addu $t1, $0, $t2
-	j condmin
-##########################################
+		c.lt.s $f0,$f5
+		bc1t FAIL
+		
+		add.s $f3,$f1,$f1 ## f3 = 2pi
+		mul.s $f3,$f3,$f0  ## Chu vi = 2pi*R = $f3
+		
+		mul.s $f4,$f0,$f0
+		mul.s $f4,$f4,$f1 ## Dien tich = pi*R^2 = $f4
+
+## IN KET QUA	
+		mfc1 $zero,$f5		
+		la,$a0,str2
+		li,$v0,4
+		syscall
+		
+		li,$v0,2
+		add.s $f12,$f5,$f3
+		syscall
+		
+## 		
+		li $v0,11
+		add $a0,$zero,0xA
+		syscall
+##
+		la,$a0,str1
+		li,$v0,4
+		syscall
+		
+		li,$v0,2
+		add.s $f12,$f5,$f4
+		syscall		
+		
+		li,$v0,10
+		syscall
+		
+		
+FAIL:		la,$a0,fail
+		li,$v0,4
+		syscall		
+		
+		li,$v0,10
+		syscall
+		
