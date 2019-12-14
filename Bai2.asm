@@ -1,16 +1,49 @@
 .data
-	str: .asciiz "Ket qua phep toan 100000 + 1000 - 100 la: "
+	str: .asciiz "Nhap so a: "
+	str1: .asciiz "Nhap so b: "
+	str2: .asciiz "Nhap so c: "
+
 .text
-	li $v0,4
-	la $a0,str
+# $t0 -> a; $t3->b; $t4->c
+
+	li  $v0,4
+	la  $a0,str
+	syscall 
+	 
+	li $v0,5
 	syscall
+	move $t0,$v0
+####################
+	li  $v0,4
+	la  $a0,str1
+	syscall 
+	 
+	li $v0,5
+	syscall
+	move $t3,$v0
+#####################
+	li  $v0,4
+	la  $a0,str2
+	syscall 
+	 
+	li $v0,5
+	syscall
+	move $t4,$v0
+####################
+
+	subi $t1,$t0,-3 # t1 = a - (-3)
+	subi $t2,$t0,4 # t2 = a - 4
 	
-	li $t0,100000
-	li $t1,1000
-	li $t2,100
-	add $t0,$t0,$t1
-	sub $t0,$t0,$t2
+	bge  $t1,$zero,iff
+	iff: ble $t2,$zero,true
 	
+	add $t0,$t3,$t4
+	j exit
+		
+	true: sub $t0,$t3,$t4
+
+	
+	exit:
 	li $v0,1
 	move $a0,$t0
 	syscall
